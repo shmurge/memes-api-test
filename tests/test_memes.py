@@ -1,5 +1,12 @@
+import allure
 import pytest
+from config.base_test import BaseTest
 
 
-def test_one():
-    pass
+class TestMemes(BaseTest):
+
+    def test_create_meme(self):
+        self.memes_api.create_meme()
+
+    def test_one(self):
+        pass

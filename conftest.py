@@ -1,8 +1,9 @@
 import pytest
 import os
 from dotenv import load_dotenv, set_key
-from http_client.endpoints.base_endpoint import BaseEndpoint
-from http_client.models.base_models import RequestAuthorizationModel
+from api_client.base_api import BaseApi
+from api_client.base_endpoints import BaseEndpoints
+from api_client.base_models import RequestAuthorizationModel
 
 
 def set_env_key(key, value):
@@ -14,19 +15,19 @@ def set_env_key(key, value):
     set_key(env_path, key, value)
 
 
-#set_env_key('USERNAME', '')
-#set_env_key('API-TOKEN', '')
-
-HOST = 'http://memesapi.course.qa-practice.com'
+HOST = BaseEndpoints.HOST
 
 
 @pytest.fixture(scope='session', autouse=True)
 def check_token():
     token = os.getenv('API-TOKEN')
+    username = os.getenv('USERNAME')
     if token:
-        print(BaseEndpoint().api_token_is_alive(token))
+        if not BaseApi().api_token_is_alive(token):
+            resp = BaseApi().user_authorization(RequestAuthorizationModel(
+                name=username))
+            set_env_key('API-TOKEN', resp.token)
     else:
-        username = os.getenv('USERNAME')
-        resp = BaseEndpoint().user_authorization(RequestAuthorizationModel(
+        resp = BaseApi().user_authorization(RequestAuthorizationModel(
             name=username))
         set_env_key('API-TOKEN', resp.token)
