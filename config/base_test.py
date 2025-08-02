@@ -1,4 +1,4 @@
-from api_client.memes.memes_api import MemesApi
+from api_client.memes_api.memes_api import MemesApi
 
 
 class BaseTest:

@@ -4,6 +4,9 @@ from dotenv import load_dotenv, set_key
 from api_client.base_api import BaseApi
 from api_client.base_endpoints import BaseEndpoints
 from api_client.base_models import RequestAuthorizationModel
+from api_client.memes_api.models.response_memes_models import ResponseMemeModel
+from api_client.memes_api.payloads import MemesPayloads
+from api_client.memes_api.memes_api import MemesApi
 
 
 def set_env_key(key, value):
@@ -31,3 +34,14 @@ def check_token():
         resp = BaseApi().user_authorization(RequestAuthorizationModel(
             name=username))
         set_env_key('API-TOKEN', resp.token)
+
+@pytest.fixture()
+def pre_create_meme():
+
+    return MemesApi().create_meme(MemesPayloads().create_meme)
+
+@pytest.fixture()
+def pre_create_and_delete_meme():
+    req = MemesApi().create_meme(MemesPayloads().create_meme)
+    yield req
+    MemesApi().delete_meme(req.id)

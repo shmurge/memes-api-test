@@ -9,6 +9,11 @@ class BaseAssertions:
             assert 200 == response.status_code, response.json()
 
     @staticmethod
+    def check_status_code_is_404(response):
+        with allure.step('Status code is 404'):
+            assert 404 == response.status_code, response.json()
+
+    @staticmethod
     def check_data_is_equal(exp, act):
         assert exp == act, (f'Data is not equal!\n'
                             f'Exp: {exp}\n'
