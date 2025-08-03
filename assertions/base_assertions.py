@@ -18,3 +18,7 @@ class BaseAssertions:
         assert exp == act, (f'Data is not equal!\n'
                             f'Exp: {exp}\n'
                             f'Act: {act}')
+
+    @staticmethod
+    def is_data_in_array(data, array):
+        return True if data in array else False

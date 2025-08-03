@@ -10,5 +10,6 @@ class ResponseMemeModel(BaseModel):
     updated_by: str
     url: str
 
+
 class ResponseMemeListModel(BaseModel):
-    data: ResponseMemeModel
+    data: List[ResponseMemeModel]

@@ -17,7 +17,6 @@ class BaseApi(Helper):
 
     def user_authorization(self, payload):
         with allure.step('User authorization'):
-
             resp = requests.post(
                 url=self.base_endpoints.authorization,
                 headers=self.headers.base_headers,
@@ -28,7 +27,6 @@ class BaseApi(Helper):
             self.attach_response(resp.json())
 
             return ResponseAuthorizationModel(**resp.json())
-
 
     def api_token_is_alive(self, token):
         with allure.step('Checking api token is alive'):
