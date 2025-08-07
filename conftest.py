@@ -1,3 +1,4 @@
+import allure
 import pytest
 import os
 from dotenv import load_dotenv, set_key
@@ -14,25 +15,27 @@ def set_env_key(key, value):
 
     load_dotenv(env_path)
 
+    os.environ[key] = value
     set_key(env_path, key, value)
 
 
 HOST = BaseEndpoints.HOST
 
 
-@pytest.fixture(scope='session', autouse=True)
+@pytest.fixture(autouse=True, scope='session')
 def check_token():
-    token = os.getenv('API-TOKEN')
-    username = os.getenv('USERNAME')
-    if token:
-        if not BaseApi().api_token_is_alive(token):
+    with allure.step('Получение апи токена'):
+        token = os.getenv('API-TOKEN')
+        username = os.getenv('USERNAME')
+        if token:
+            if not BaseApi().api_token_is_alive(token):
+                resp = BaseApi().user_authorization(RequestAuthorizationModel(
+                    name=username))
+                set_env_key('API-TOKEN', resp.token)
+        else:
             resp = BaseApi().user_authorization(RequestAuthorizationModel(
                 name=username))
             set_env_key('API-TOKEN', resp.token)
-    else:
-        resp = BaseApi().user_authorization(RequestAuthorizationModel(
-            name=username))
-        set_env_key('API-TOKEN', resp.token)
 
 
 @pytest.fixture()

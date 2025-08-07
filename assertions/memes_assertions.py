@@ -20,7 +20,7 @@ class MemesAssertions(BaseAssertions):
         self.headers = Headers()
 
     def check_meme_fields(self, payload, response):
-        with allure.step('Check information of meme'):
+        with allure.step('Проверка данных мема'):
             self.check_data_is_equal(payload.text, response.text)
             self.check_data_is_equal(payload.url, response.url)
             self.check_data_is_equal(payload.tags, response.tags)
@@ -28,21 +28,21 @@ class MemesAssertions(BaseAssertions):
             self.check_data_is_equal(self.username, response.updated_by)
 
     def id_should_not_change(self, exp_id, act_id):
-        with allure.step('Meme id should not change'):
+        with allure.step('ID мема не изменился'):
             self.check_data_is_equal(exp_id, act_id)
 
     def meme_should_not_be_found(self, mem_id):
-        with allure.step(f"Meme with id {mem_id} should not be found"):
+        with allure.step(f"Мем с id {mem_id} не был найден!"):
             resp = requests.get(
                 url=f"{self.endpoints.get_all_memes}/{mem_id}",
-                headers=self.headers.headers_with_auth
+                headers=self.headers.headers_with_auth()
             )
 
             self.check_status_code_is_404(resp)
 
     def meme_should_be_in_list(self, memes_list, response):
-        with allure.step('Meme should be in memes list'):
-            assert self.is_data_in_array(response, memes_list), (f'Meme not found in memes list!\n'
+        with allure.step('Мем отображается в списке'):
+            assert self.is_data_in_array(response, memes_list), (f'Мем не найден в списке!\n'
                                                                  f'{response}')
 
             for meme in memes_list:
@@ -51,15 +51,15 @@ class MemesAssertions(BaseAssertions):
                     break
 
     def meme_should_not_be_in_list(self, memes_list, response):
-        with allure.step('Meme should not be in memes list'):
+        with allure.step('Мем не отображается в списке'):
             assert not self.is_data_in_array(response, memes_list), (
-                f'Meme was not removed from memes list!\n'
+                f'Мем не был удален из списка!\n'
                 f'{response}')
 
     @staticmethod
     def check_message_after_meme_deleting(mem_id, response):
-        with allure.step('Check message after meme deleting'):
+        with allure.step('Отображается сообщение об успешном удалении мема'):
             exp_message = f'Meme with id {mem_id} successfully deleted'
-            assert exp_message == response, (f'Incorrect message!\n'
-                                             f'Exp: {exp_message}\n'
-                                             f'Act: {response}')
+            assert exp_message == response, (f'Некорректное сообщение!\n'
+                                             f'ОР: {exp_message}\n'
+                                             f'ФР: {response}')

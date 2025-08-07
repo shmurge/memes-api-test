@@ -20,10 +20,10 @@ class MemesApi(BaseApi):
         self.assertions = MemesAssertions()
 
     def create_meme(self, payload):
-        with allure.step("Create meme"):
+        with allure.step("Создать мем"):
             resp = requests.post(
                 url=self.endpoints.create_meme,
-                headers=self.headers.headers_with_auth,
+                headers=self.headers.headers_with_auth(),
                 json=payload.model_dump()
             )
 
@@ -34,10 +34,10 @@ class MemesApi(BaseApi):
             return ResponseMemeModel(**resp.json())
 
     def update_meme(self, mem_id, payload):
-        with allure.step(f"Update meme with id: {mem_id}"):
+        with allure.step(f"Изменить мем с id: {mem_id}"):
             resp = requests.put(
                 url=self.endpoints.update_meme(mem_id),
-                headers=self.headers.headers_with_auth,
+                headers=self.headers.headers_with_auth(),
                 json=payload.model_dump()
             )
 
@@ -47,10 +47,10 @@ class MemesApi(BaseApi):
             return ResponseMemeModel(**resp.json())
 
     def get_meme_by_id(self, mem_id):
-        with allure.step(f"Get meme by id: {mem_id}"):
+        with allure.step(f"Вернуть мем с id: {mem_id}"):
             resp = requests.get(
                 url=f"{self.endpoints.get_all_memes}/{mem_id}",
-                headers=self.headers.headers_with_auth
+                headers=self.headers.headers_with_auth()
             )
 
             self.assertions.check_status_code_is_200(resp)
@@ -60,10 +60,10 @@ class MemesApi(BaseApi):
             return ResponseMemeModel(**resp.json())
 
     def get_all_memes(self):
-        with allure.step("Get all memes"):
+        with allure.step("Вернуть все мемы"):
             resp = requests.get(
                 url=self.endpoints.get_all_memes,
-                headers=self.headers.headers_with_auth
+                headers=self.headers.headers_with_auth()
             )
 
             self.assertions.check_status_code_is_200(resp)
@@ -72,10 +72,10 @@ class MemesApi(BaseApi):
             return ResponseMemeListModel(**resp.json())
 
     def delete_meme(self, mem_id):
-        with allure.step(f"Delete meme with id: {mem_id}"):
+        with allure.step(f"Удалить мем с id: {mem_id}"):
             resp = requests.delete(
                 url=self.endpoints.delete_meme(mem_id),
-                headers=self.headers.headers_with_auth
+                headers=self.headers.headers_with_auth()
             )
 
             self.assertions.check_status_code_is_200(resp)
