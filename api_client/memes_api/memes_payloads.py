@@ -8,21 +8,17 @@ fake = Faker()
 
 
 class MemesPayloads:
-
-    def create_meme(self):
-        model = RequestCreateMemeModel(
-            text=fake.text(),
-            url=fake.url(),
-            tags=[fake.text(max_nb_chars=5),
-                  fake.text(max_nb_chars=6),
-                  fake.text(max_nb_chars=7)
-                  ],
-            info={"colors": [fake.color() for _ in range(2)],
-                  "names": [fake.name() for _ in range(2)]
-                  }
-        )
-
-        return model
+    create_meme = RequestCreateMemeModel(
+        text=fake.text(),
+        url=fake.url(),
+        tags=[fake.text(max_nb_chars=5),
+              fake.text(max_nb_chars=6),
+              fake.text(max_nb_chars=7)
+              ],
+        info={"colors": [fake.color() for _ in range(2)],
+              "names": [fake.name() for _ in range(2)]
+              }
+    )
 
     def update_meme(self, mem_id):
         model = RequestUpdateMemeModel(
@@ -39,3 +35,5 @@ class MemesPayloads:
         )
 
         return model
+
+    invalid_meme_ids_list = [-1, 20.01, 0.1, [10], {1: 2}, "qwe", ['qwe', 'rty'], ('adsa', 213, 23.459)]

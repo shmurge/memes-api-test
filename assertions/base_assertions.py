@@ -16,6 +16,12 @@ class BaseAssertions:
                                                  f"{response.json()}")
 
     @staticmethod
+    def check_status_code_is_403(response):
+        with allure.step('Статус-код 404'):
+            assert 403 == response.status_code, (f"Статус-код {response.status_code}\n"
+                                                 f"{response.json()}")
+
+    @staticmethod
     def check_status_code_is_404(response):
         with allure.step('Статус-код 404'):
             assert 404 == response.status_code, (f"Статус-код {response.status_code}\n"

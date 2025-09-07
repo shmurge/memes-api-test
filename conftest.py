@@ -5,7 +5,7 @@ from dotenv import load_dotenv, set_key
 from api_client.base_api import BaseApi
 from api_client.base_endpoints import BaseEndpoints
 from api_client.base_models import RequestAuthorizationModel
-from api_client.memes_api.payloads import MemesPayloads
+from api_client.memes_api.memes_payloads import MemesPayloads
 from api_client.memes_api.memes_api import MemesApi
 
 
@@ -40,12 +40,12 @@ def check_token():
 
 @pytest.fixture()
 def pre_create_meme():
-    return MemesApi().create_meme(MemesPayloads().create_meme())
+    return MemesApi().create_meme(MemesPayloads().create_meme)
 
 
 @pytest.fixture()
 def pre_create_and_delete_meme():
-    req = MemesApi().create_meme(MemesPayloads().create_meme())
+    req = MemesApi().create_meme(MemesPayloads().create_meme)
 
     yield req
 
@@ -54,14 +54,14 @@ def pre_create_and_delete_meme():
 
 @pytest.fixture()
 def pre_update_meme():
-    req = MemesApi().create_meme(MemesPayloads().create_meme())
+    req = MemesApi().create_meme(MemesPayloads().create_meme)
 
     return MemesApi().update_meme(req.id, MemesPayloads().update_meme(req.id))
 
 
 @pytest.fixture()
 def pre_update_and_delete_meme():
-    req_1 = MemesApi().create_meme(MemesPayloads().create_meme())
+    req_1 = MemesApi().create_meme(MemesPayloads().create_meme)
     req_2 = MemesApi().update_meme(req_1.id, MemesPayloads().update_meme(req_1.id))
 
     yield req_2
