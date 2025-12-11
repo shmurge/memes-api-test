@@ -41,7 +41,7 @@ HOST = BaseEndpoints.HOST
 @pytest.fixture(autouse=True, scope='session')
 def check_token(save_to_env=False):
     with allure.step('Получение апи токена'):
-        token = os.getenv('API-TOKEN')
+        token = os.getenv('API_TOKEN')
         username = os.getenv('USERNAME')
         print()
         print(f'Username is: {username}', f'Api token is: {token}', sep='\n')
@@ -50,12 +50,12 @@ def check_token(save_to_env=False):
                 resp = BaseApi().user_authorization(RequestAuthorizationModel(
                     name=username))
                 if save_to_env:
-                    set_env_key('API-TOKEN', resp.token)
+                    set_env_key('API_TOKEN', resp.token)
         else:
             resp = BaseApi().user_authorization(RequestAuthorizationModel(
                 name=username))
             if save_to_env:
-                set_env_key('API-TOKEN', resp.token)
+                set_env_key('API_TOKEN', resp.token)
 
 
 @pytest.fixture()
