@@ -43,6 +43,8 @@ def check_token(save_to_env=False):
     with allure.step('Получение апи токена'):
         token = os.getenv('API-TOKEN')
         username = os.getenv('USERNAME')
+        print()
+        print(f'Username is: {username}', f'Api token is: {token}', sep='\n')
         if token:
             if not BaseApi().api_token_is_alive(token):
                 resp = BaseApi().user_authorization(RequestAuthorizationModel(
