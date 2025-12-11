@@ -14,5 +14,5 @@ class Headers:
 
         return {
              'Content-Type': 'application/json',
-             'Authorization': os.getenv('API-TOKEN')
+             'Authorization': os.getenv('API_TOKEN')
         }
