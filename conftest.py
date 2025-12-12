@@ -7,7 +7,7 @@ from api_client.base_endpoints import BaseEndpoints
 from api_client.base_models import RequestAuthorizationModel
 from api_client.memes_api.memes_payloads import MemesPayloads
 from api_client.memes_api.memes_api import MemesApi
-from environments import SAVE_TO_DOTENV
+from constants import SAVE_TO_DOTENV
 
 
 class ValidationError(Exception):
