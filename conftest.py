@@ -7,6 +7,11 @@ from api_client.base_endpoints import BaseEndpoints
 from api_client.base_models import RequestAuthorizationModel
 from api_client.memes_api.memes_payloads import MemesPayloads
 from api_client.memes_api.memes_api import MemesApi
+from environments import SAVE_TO_DOTENV
+
+
+class ValidationError(Exception):
+    pass
 
 
 def set_env_key(key, value):
@@ -22,40 +27,39 @@ def set_env_key(key, value):
 HOST = BaseEndpoints.HOST
 
 
-# @pytest.fixture(autouse=True, scope='session')
-# def check_token(save_to_env=True):
-#     if save_to_env:
-#         with allure.step('Получение апи токена'):
-#             token = os.getenv('API-TOKEN')
-#             username = os.getenv('USERNAME')
-#             if token:
-#                 if not BaseApi().api_token_is_alive(token):
-#                     resp = BaseApi().user_authorization(RequestAuthorizationModel(
-#                         name=username))
-#                     set_env_key('API-TOKEN', resp.token)
-#             else:
-#                 resp = BaseApi().user_authorization(RequestAuthorizationModel(
-#                     name=username))
-#                 set_env_key('API-TOKEN', resp.token)
-
-@pytest.fixture(autouse=True, scope='session')
-def check_token(save_to_env=False):
-    with allure.step('Получение апи токена'):
-        token = os.getenv('API_TOKEN')
-        username = os.getenv('USERNAME')
-        print()
-        print(f'Username is: {username}', f'Api token is: {token}', sep='\n')
+def save_token_to_env(username, token):
+    with allure.step('Запись токена в .env'):
         if token:
             if not BaseApi().api_token_is_alive(token):
                 resp = BaseApi().user_authorization(RequestAuthorizationModel(
                     name=username))
-                if save_to_env:
-                    set_env_key('API_TOKEN', resp.token)
+                set_env_key('API_TOKEN', resp.token)
+            else:
+                resp = BaseApi().user_authorization(RequestAuthorizationModel(
+                    name=username))
+                set_env_key('API_TOKEN', resp.token)
         else:
             resp = BaseApi().user_authorization(RequestAuthorizationModel(
                 name=username))
-            if save_to_env:
-                set_env_key('API_TOKEN', resp.token)
+            set_env_key('API_TOKEN', resp.token)
+
+
+@pytest.fixture(autouse=True, scope='session')
+def check_token():
+    with allure.step('Проверка апи токена'):
+        try:
+            token = os.getenv('API_TOKEN')
+            username = os.getenv('USERNAME')
+            if SAVE_TO_DOTENV:
+                save_token_to_env(username=username, token=token)
+            else:
+                if token:
+                    if not BaseApi().api_token_is_alive(token):
+                        raise ValidationError('API token is invalid or expired')
+                elif not token:
+                    raise ValidationError('API token is missing')
+        except ValidationError as e:
+            pytest.exit(str(e))
 
 
 @pytest.fixture()
