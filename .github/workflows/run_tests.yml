@@ -82,9 +82,9 @@ jobs:
         run: pip install -r requirements.txt
       - name: Download all workflow run artifacts
         uses: actions/download-artifact@v4
-      - name: Get variables
-        env: 
-          USERNAME: ${{ vars.USERNAME } 
+      - name: get variables
+        env:
+          USERNAME: ${{ vars.USERNAME }}
           API_TOKEN: ${{ vars.API_TOKEN }}
       - name: tests-with-one-worker
         if: "github.event.inputs.deployment_target == 'tests-with-one-worker'"
