@@ -1,0 +1,31 @@
+name: Delete all artifacts
+
+on:
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Delete artifacts
+        env:
+          GITHUB_TOKEN: ${{ secrets.SECRET_TOKEN }}
+        run: |
+          # Получаем список артефактов
+          artifacts=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/shmurge/onlineStore/actions/artifacts")
+
+          # Извлекаем ID артефактов и удаляем их
+          echo "$artifacts" | jq -c '.artifacts[]' | while read -r artifact; do
+            artifact_id=$(echo "$artifact" | jq -r '.id')
+            artifact_name=$(echo "$artifact" | jq -r '.name')
+            
+            # Удаляем артефакт
+            response=$(curl -s -X DELETE -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/shmurge/onlineStore/actions/artifacts/$artifact_id")
+            
+            if [ $(echo "$response" | jq -r '.message') == "Not Found" ]; then
+              echo "Артефакт $artifact_name успешно удален."
+            else
+              echo "Ошибка при удалении артефакта $artifact_name: $(echo "$response" | jq -r '.message')"
+            fi
+          done
