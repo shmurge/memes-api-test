@@ -83,12 +83,9 @@ jobs:
       - name: Download all workflow run artifacts
         uses: actions/download-artifact@v4
       - name: Get variables
-        env:
-          USERNAME: ${{ vars.USERNAME }}
+        env: 
+          USERNAME: ${{ vars.USERNAME } 
           API_TOKEN: ${{ vars.API_TOKEN }}
-          run: |
-            echo $USERNAME
-            echo $API_TOKEN
       - name: tests-with-one-worker
         if: "github.event.inputs.deployment_target == 'tests-with-one-worker'"
         run: pytest -v -s --tb=line --reruns=3 --alluredir=allure-report
