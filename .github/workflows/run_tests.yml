@@ -26,7 +26,7 @@ jobs:
     name: Download Allure report history
     steps:
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.11'
       - run: |
@@ -73,22 +73,19 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.11'
       - name: Install dependencies
         run: pip install -r requirements.txt
       - name: Download all workflow run artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
       - name: get variables
         run: |
           echo "USERNAME=${{ vars.USERNAME }}" >> $GITHUB_ENV
           echo "API_TOKEN=${{ vars.API_TOKEN }}" >> $GITHUB_ENV
-        # env:
-        #   USERNAME: ${{ vars.USERNAME }}
-        #   API_TOKEN: ${{ vars.API_TOKEN }}
       - name: tests-with-one-worker
         if: "github.event.inputs.deployment_target == 'tests-with-one-worker'"
         run: pytest -v -s --tb=line --reruns=3 --alluredir=allure-report
@@ -124,7 +121,7 @@ jobs:
     needs: test-run
 
     steps:
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '21'
@@ -133,7 +130,7 @@ jobs:
           && 
           sudo tar -zxvf allure-2.32.0.tgz -C /opt/ && sudo ln -s /opt/allure-2.32.0/bin/allure /usr/bin/allure
       - name: Download all workflow run artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
       - run: allure generate -c allure_report -o _site
       - name: Upload generated Allure report
         uses: actions/upload-artifact@v4
@@ -149,7 +146,7 @@ jobs:
     needs: generate-allure-report
     steps:
       - name: Download all workflow run artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3
       - name: Deploy to Github pages
