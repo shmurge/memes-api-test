@@ -1,4 +1,4 @@
-name: API tests memes-api
+name: API tests Memes api
 
 on:
   workflow_dispatch:
