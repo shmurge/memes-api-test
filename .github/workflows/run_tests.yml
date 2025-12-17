@@ -58,13 +58,12 @@ jobs:
         continue-on-error: true
       - run: cp pages_history/history/* allure_report && cp -r pages_history/history allure_report
         continue-on-error: true
-      - name: Download allure history
-        uses: actions/upload-artifact@v6
-        with:
-          name: allure_report
-          path:
-            allure_report
-          retention-days: 3
+      # - name: Download allure history
+      #   uses: actions/upload-artifact@v6
+      #   with:
+      #     name: allure_report
+      #     path: allure_report
+      #     retention-days: 3
 
   test-run:
     name: Test run
@@ -106,12 +105,12 @@ jobs:
         if: "github.event.inputs.deployment_target == 'tests-with-five-workers'"
         run: pytest -vs --tb=line --reruns=3 -n=5 --alluredir=allure_report
         continue-on-error: true
-      - name: Upload Allure report
-        uses: actions/upload-artifact@v6
-        with:
-          name: allure_report
-          path: allure_report
-          retention-days: 3
+      # - name: Upload Allure report
+      #   uses: actions/upload-artifact@v6
+      #   with:
+      #     name: allure_report
+      #     path: allure_report
+      #     retention-days: 3
           #overwrite: true
 
   generate-allure-report:
@@ -135,8 +134,7 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: _site
-          path:
-            _site
+          path: _site
           retention-days: 3
 
   publish-allure-report:
@@ -147,6 +145,7 @@ jobs:
       - name: Download all workflow run artifacts
         uses: actions/download-artifact@v5
       - name: Upload pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
       - name: Deploy to Github pages
+        id: deployment
         uses: actions/deploy-pages@v4
