@@ -106,14 +106,13 @@ jobs:
         if: "github.event.inputs.deployment_target == 'tests-with-five-workers'"
         run: pytest -vs --tb=line --reruns=3 -n=5 --alluredir=allure_report
         continue-on-error: true
-      # - name: Upload Allure report
-      #   uses: actions/upload-artifact@v6
-      #   with:
-      #     name: allure_report
-      #     path:
-      #       allure_report
-      #     retention-days: 3
-      #     overwrite: true
+      - name: Upload Allure report
+        uses: actions/upload-artifact@v6
+        with:
+          name: allure_report
+          path: allure_report
+          retention-days: 3
+          #overwrite: true
 
   generate-allure-report:
     name: Generate Allure report
