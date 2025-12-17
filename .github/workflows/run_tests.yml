@@ -59,7 +59,7 @@ jobs:
       - run: cp pages_history/history/* allure_report && cp -r pages_history/history allure_report
         continue-on-error: true
       - name: Download allure history
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: allure_report
           path:
@@ -106,14 +106,14 @@ jobs:
         if: "github.event.inputs.deployment_target == 'tests-with-five-workers'"
         run: pytest -vs --tb=line --reruns=3 -n=5 --alluredir=allure_report
         continue-on-error: true
-      - name: Upload Allure report
-        uses: actions/upload-artifact@v4
-        with:
-          name: allure_report
-          path:
-            allure_report
-          retention-days: 3
-          overwrite: true
+      # - name: Upload Allure report
+      #   uses: actions/upload-artifact@v6
+      #   with:
+      #     name: allure_report
+      #     path:
+      #       allure_report
+      #     retention-days: 3
+      #     overwrite: true
 
   generate-allure-report:
     name: Generate Allure report
@@ -126,14 +126,14 @@ jobs:
           distribution: 'microsoft'
           java-version: '17'
       - run: > 
-          sudo wget https://github.com/allure-framework/allure2/releases/download/2.32.0/allure-2.32.0.tgz 
+          sudo wget https://github.com/allure-framework/allure2/releases/download/2.36.0/allure-2.36.0.tgz 
           && 
-          sudo tar -zxvf allure-2.32.0.tgz -C /opt/ && sudo ln -s /opt/allure-2.32.0/bin/allure /usr/bin/allure
+          sudo tar -zxvf allure-2.36.0.tgz -C /opt/ && sudo ln -s /opt/allure-2.36.0/bin/allure /usr/bin/allure
       - name: Download all workflow run artifacts
         uses: actions/download-artifact@v5
       - run: allure generate -c allure_report -o _site
       - name: Upload generated Allure report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: _site
           path:
