@@ -88,7 +88,7 @@ jobs:
           echo "API_TOKEN=${{ vars.API_TOKEN }}" >> $GITHUB_ENV
       - name: tests-with-one-worker
         if: "github.event.inputs.deployment_target == 'tests-with-one-worker'"
-        run: pytest -vs --tb=line --reruns=3 --alluredir=allure_report
+        run: pytest -vs --tb=line --reruns 3 --alluredir allure_report
         continue-on-error: true
       - name: tests-with-two-workers
         if: "github.event.inputs.deployment_target == 'tests-with-two-workers'"
