@@ -238,7 +238,7 @@ jobs:
       - name: Get variables
         run: |
           echo "USERNAME=${{ vars.USERNAME }}" >> $GITHUB_ENV
-          echo "API_TOKEN=${{ vars.API_TOKEN }}" >> $GITHUB_ENV
+          echo "API_TOKEN=${{ secrets.API_TOKEN }}" >> $GITHUB_ENV
       - name: run-tests-with-one-worker
         if: "github.event.inputs.deployment_target == 'tests-with-one-worker'"
         run: pytest -vs --tb=line --reruns 3 --alluredir allure_report
