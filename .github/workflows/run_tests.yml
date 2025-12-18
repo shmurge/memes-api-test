@@ -1,156 +1,3 @@
-# name: API tests Memes api
-
-# on:
-#   workflow_dispatch:
-#     inputs:
-#       deployment_target:
-#         description: Choose target
-#         required: true
-#         default: tests-with-one-worker
-#         type: choice
-#         options:
-#           - tests-with-one-worker
-#           - tests-with-two-workers
-#           - tests-with-three-workers
-#           - tests-with-four-workers
-#           - tests-with-five-workers
-
-# permissions:
-#   contents: read
-#   pages: write
-#   id-token: write
-
-# jobs:
-#   download-history:
-#     runs-on: ubuntu-latest
-#     name: Download Allure report history
-#     steps:
-#       - name: Set up Python
-#         uses: actions/setup-python@v6
-#         with:
-#           python-version: '3.11'
-#       - run: |
-#           ARTIFACT_ID=$(curl -L \
-#           -H "Accept: application/vnd.github+json" \
-#           "https://api.github.com/repos/shmurge/memes-api-test/actions/artifacts?name=allure_report" | \
-#           python3 -c "import sys, json; print(json.load(sys.stdin)['artifacts'][0]['id']);") \
-#           &&
-#           curl -L \
-#           -H "Accept: application/vnd.github+json" \
-#           -H "Authorization: Bearer ${{ secrets.SECRET_TOKEN }}" \
-#           -H "X-GitHub-Api-Version: 2022-11-28" \
-#           https://api.github.com/repos/shmurge/memes-api-test/actions/artifacts/$ARTIFACT_ID/zip -o artifacts.zip \
-#           &&
-#           REPORT_ID=$(curl -L \
-#           -H "Accept: application/vnd.github+json" \
-#           "https://api.github.com/repos/shmurge/memes-api-test/actions/artifacts?name=github-pages" | \
-#           python3 -c "import sys, json; print(json.load(sys.stdin)['artifacts'][0]['id']);") \
-#           &&
-#           curl -L \
-#           -H "Accept: application/vnd.github+json" \
-#           -H "Authorization: Bearer ${{ secrets.SECRET_TOKEN }}" \
-#           -H "X-GitHub-Api-Version: 2022-11-28" \
-#           https://api.github.com/repos/shmurge/memes-api-test/actions/artifacts/$REPORT_ID/zip -o pages.zip
-#         continue-on-error: true
-#       - run: mkdir allure_report && unzip artifacts.zip -d allure_report
-#         continue-on-error: true
-#       - run: mkdir old_pages pages_history && unzip pages.zip -d old_pages && tar -xvf old_pages/artifact.tar -C pages_history
-#         continue-on-error: true
-#       - run: cp pages_history/history/* allure_report && cp -r pages_history/history allure_report
-#         continue-on-error: true
-#       - name: Download allure history
-#         uses: actions/upload-artifact@v6
-#         with:
-#           name: allure_report
-#           path: allure_report
-#           retention-days: 3
-
-#   test-run:
-#     name: Test run
-#     runs-on: ubuntu-latest
-#     needs: download-history
-
-#     steps:
-#       - name: Checkout repository
-#         uses: actions/checkout@v6
-#       - name: Set up Python
-#         uses: actions/setup-python@v6
-#         with:
-#           python-version: '3.11'
-#       - name: Install dependencies
-#         run: pip install -r requirements.txt
-#       - name: Download all workflow run artifacts
-#         uses: actions/download-artifact@v5
-#       - name: get variables
-#         run: |
-#           echo "USERNAME=${{ vars.USERNAME }}" >> $GITHUB_ENV
-#           echo "API_TOKEN=${{ vars.API_TOKEN }}" >> $GITHUB_ENV
-#       - name: tests-with-one-worker
-#         if: "github.event.inputs.deployment_target == 'tests-with-one-worker'"
-#         run: pytest -vs --tb=line --reruns=3 --alluredir=allure_report
-#         continue-on-error: true
-#       - name: tests-with-two-workers
-#         if: "github.event.inputs.deployment_target == 'tests-with-two-workers'"
-#         run: pytest -vs --tb=line --reruns=3 -n=2 --alluredir=allure_report
-#         continue-on-error: true
-#       - name: tests-with-three-workers
-#         if: "github.event.inputs.deployment_target == 'tests-with-three-workers'"
-#         run: pytest -vs --tb=line --reruns=3 -n=3 --alluredir=allure_report
-#         continue-on-error: true
-#       - name: tests-with-four-workers
-#         if: "github.event.inputs.deployment_target == 'tests-with-four-workers'"
-#         run: pytest -vs --tb=line --reruns=3 -n=4 --alluredir=allure_report
-#         continue-on-error: true
-#       - name: tests-with-five-workers
-#         if: "github.event.inputs.deployment_target == 'tests-with-five-workers'"
-#         run: pytest -vs --tb=line --reruns=3 -n=5 --alluredir=allure_report
-#         continue-on-error: true
-#       - name: Upload Allure report
-#         uses: actions/upload-artifact@v6
-#         with:
-#           name: allure_report
-#           path: allure_report
-#           retention-days: 3
-#           overwrite: true
-
-#   generate-allure-report:
-#     name: Generate Allure report
-#     runs-on: ubuntu-latest
-#     needs: test-run
-
-#     steps:
-#       - uses: actions/setup-java@v5
-#         with:
-#           distribution: 'microsoft'
-#           java-version: '17'
-#       - run: > 
-#           sudo wget https://github.com/allure-framework/allure2/releases/download/2.36.0/allure-2.36.0.tgz 
-#           && 
-#           sudo tar -zxvf allure-2.36.0.tgz -C /opt/ && sudo ln -s /opt/allure-2.36.0/bin/allure /usr/bin/allure
-#       - name: Download all workflow run artifacts
-#         uses: actions/download-artifact@v5
-#       - run: allure generate -c allure_report -o _site
-#       - name: Upload generated Allure report
-#         uses: actions/upload-artifact@v6
-#         with:
-#           name: _site
-#           path: _site
-#           retention-days: 3
-
-#   publish-allure-report:
-#     name: Publication allure-report
-#     runs-on: ubuntu-latest
-#     needs: generate-allure-report
-#     steps:
-#       - name: Download all workflow run artifacts
-#         uses: actions/download-artifact@v5
-#       - name: Upload pages artifact
-#         uses: actions/upload-pages-artifact@v4
-#       - name: Deploy to Github pages
-#         id: deployment
-#         uses: actions/deploy-pages@v4
-
-
 name: API tests Memes api
 
 on:
@@ -217,7 +64,7 @@ jobs:
           name: allure_report
           path:
             allure_report
-          retention-days: 1
+          retention-days: 3
 
   test-run:
     name: Test run
@@ -265,7 +112,7 @@ jobs:
           name: allure_report
           path:
             allure_report
-          retention-days: 1
+          retention-days: 3
           overwrite: true
 
   generate-allure-report:
