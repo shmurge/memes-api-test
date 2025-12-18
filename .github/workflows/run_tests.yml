@@ -243,20 +243,22 @@ jobs:
         if: "github.event.inputs.deployment_target == 'tests-with-one-worker'"
         run: pytest -vs --tb=line --reruns 3 --alluredir allure_report
         continue-on-error: true
-      # - name: chrome-with-auth
-      #   if: "github.event.inputs.deployment_target == 'chrome-with-auth'"
-      #   run: pytest -v -s --tb=line --headless --login -m=may_be_login --alluredir allure_report
-      #   continue-on-error: true
-      # - name: firefox-without-auth
-      #   if: "github.event.inputs.deployment_target == 'firefox-without-auth'"
-      #   run: pytest -v -s --tb=line --headless --browser=firefox --github_actions --alluredir allure_report
-      #   continue-on-error: true
-      # - name: firefox-with-auth
-      #   if: "github.event.inputs.deployment_target == 'firefox-with-auth'"
-      #   run: > 
-      #     pytest -v -s --tb=line --headless --browser=firefox 
-      #     --github_actions --login -m=may_be_login --alluredir allure_report
-      #   continue-on-error: true
+      - name: run-tests-with-two-workers
+        if: "github.event.inputs.deployment_target == 'tests-with-two-workers'"
+        run: pytest -vs --tb=line --reruns 3 -n 2 --alluredir allure_report
+        continue-on-error: true
+      - name: run-tests-with-three-workers
+        if: "github.event.inputs.deployment_target == 'tests-with-three-workers'"
+        run: pytest -vs --tb=line --reruns 3 -n 3 --alluredir allure_report
+        continue-on-error: true
+      - name: run-tests-with-four-workers
+        if: "github.event.inputs.deployment_target == 'tests-with-four-workers'"
+        run: pytest -vs --tb=line --reruns 3 -n 4 --alluredir allure_report
+        continue-on-error: true
+      - name: run-tests-with-five-workers
+        if: "github.event.inputs.deployment_target == 'tests-with-five-workers'"
+        run: pytest -vs --tb=line --reruns 3 -n 5 --alluredir allure_report
+        continue-on-error: true
       - name: Upload Allure report
         uses: actions/upload-artifact@v4
         with:
