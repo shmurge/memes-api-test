@@ -10,7 +10,7 @@ jobs:
     steps:
       - name: Delete artifacts
         env:
-          TOKEN: ${{ secrets.SECRET_TOKEN }}
+          TOKEN: ${{ secrets.TOKEN }}
         run: |
           # Получаем список артефактов
           artifacts=$(curl -s -H "Authorization: token $TOKEN" "https://api.github.com/repos/shmurge/memes-api-test/actions/artifacts")
