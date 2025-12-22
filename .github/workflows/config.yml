@@ -7,18 +7,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Checkout (copy) gh-pages repository to GitHub runner
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           ref: gh-pages
           path: ./.github/gh-pages
 
-      - name: Run UI-tests via docker-compose
+      - name: Run API-tests via docker-compose
         env:
-          LOGIN: ${{ secrets.LOGIN }}
-          PASSWORD: ${{ secrets.PASSWORD }}
+          USERNAME: ${{ vars.USERNAME }}
+          API_TOKEN: ${{ secrets.API_TOKEN }}
         run: |
           docker-compose up --exit-code-from regression || true
 
@@ -36,9 +36,9 @@ jobs:
           sudo cp -R allure-report/history/* ./.github/gh-pages/history/
 
       - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@4.1.5
+        uses: JamesIves/github-pages-deploy-action@4.7.6
         with:
-          token: ${{ secrets.CI_TOKEN }}
+          token: ${{ secrets.TOKEN }}
           branch: gh-pages
           folder: allure-report
           clean: true
