@@ -35,6 +35,7 @@ jobs:
       - name: Update Allure history
         run: |
           sudo cp -R allure-report/history/* ./.github/gh-pages/history/
+        continue-on-error: true
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@4.1.5
