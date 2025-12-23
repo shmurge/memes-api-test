@@ -20,7 +20,7 @@ jobs:
           USERNAME: ${{ vars.USERNAME }}
           API_TOKEN: ${{ secrets.API_TOKEN }}
         run: |
-          docker compose up --exit-code-from regression || true
+          docker compose up --exit-code-from run_tests || true
 
       - name: Copy history from gh-pages to allure-results
         run: |
