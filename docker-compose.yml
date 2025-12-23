@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   run_tests:
-    image: python:3.11-alpine3.17
+    #image: python:3.11-alpine3.17
     build:
       context: .
       dockerfile: Dockerfile
