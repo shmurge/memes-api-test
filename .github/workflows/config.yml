@@ -30,7 +30,9 @@ jobs:
 
       - name: Generate Allure report
         run: |
-          sudo docker compose run run_tests /bin/sh -c "allure generate -c allure-results/ -o allure-report"
+          ls -la
+        # run: |
+        #   sudo docker compose run run_tests /bin/sh -c "allure generate -c allure-results/ -o allure-report"
 
       # - name: Update Allure history
       #   run: |
