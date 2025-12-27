@@ -4,6 +4,6 @@ venv
 .pytest_cache
 .venv
 __pycache__
-credentials.py
 .env
+allure-results
 allure-report
