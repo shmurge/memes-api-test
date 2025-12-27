@@ -8,7 +8,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./:/usr/workspace
-    command: /bin/sh -c "ls -la && pytest -v -s --reruns=3 -n=5 --alluredir allure-results"
+    command: /bin/sh -c "ls -la && pytest -v -s --reruns=3 -n=5 --alluredir=allure-results"
     working_dir: /usr/workspace
     environment:
       - USERNAME=${USERNAME}
