@@ -2,13 +2,13 @@ version: '3.7'
 
 services:
   run_tests:
-    image: shmurge-python:3.11-alpine3.17
+    image: shmurge3/memes-api-tests:v1.0.0
     build:
       context: .
       dockerfile: Dockerfile
     volumes:
       - ./:/usr/workspace
-    command: /bin/sh -c "ls -la && pytest -v -s --reruns=3 -n=5 --alluredir=allure-results"
+    command: /bin/sh -c "ls -la && poetry run pytest -v -s --reruns=3 -n=5 --alluredir=allure-results"
     working_dir: /usr/workspace
     environment:
       - USERNAME=${USERNAME}

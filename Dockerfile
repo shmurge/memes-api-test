@@ -1,31 +1,54 @@
+# Базовый образ: Python 3.11 на Alpine Linux (минимальный и лёгкий дистрибутив)
 FROM python:3.11-alpine3.17
-# update apk repo
-RUN echo "https://dl-4.alpinelinux.org/alpine/v3.10/main" >> /etc/apk/repositories && \
-    echo "https://dl-4.alpinelinux.org/alpine/v3.10/community" >> /etc/apk/repositories
 
-# Get all the prereqs
-RUN wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub
-RUN wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.30-r0/glibc-2.30-r0.apk
-RUN wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.30-r0/glibc-bin-2.30-r0.apk
+# Установка системных зависимостей
+RUN apk add --no-cache \
+    curl \
+    bash \
+    build-base \
+    libffi-dev \
+    openssl-dev \
+    openjdk11-jre \
+    tar \
+    wget
 
-# RUN apk update && \
-#     apk add openjdk11-jre curl tar && \
-#     curl -o allure-2.13.8.tgz -Ls https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/2.13.8/allure-commandline-2.13.8.tgz && \
-#     tar -zxvf allure-2.13.8.tgz -C /opt/ && \
-#     ln -s /opt/allure-2.13.8/bin/allure /usr/bin/allure && \
-#     rm allure-2.13.8.tgz
+# Версия Poetry (менеджер зависимостей Python)
+ENV POETRY_VERSION=2.3.4
 
-RUN apk update && \
-    apk add openjdk11-jre curl tar && \
-    curl -o allure-2.32.0.tgz -Ls https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/2.32.0/allure-commandline-2.32.0.tgz && \
-    tar -zxvf allure-2.32.0.tgz -C /opt/ && \
-    ln -s /opt/allure-2.32.0/bin/allure /usr/bin/allure && \
-    rm allure-2.32.0.tgz
+# Директория установки Poetry
+ENV POETRY_HOME=/opt/poetry
 
+# Добавление Poetry и user-local bin в PATH,
+# чтобы команда `poetry` была доступна глобально
+ENV PATH="$POETRY_HOME/bin:/root/.local/bin:$PATH"
+
+# Установка Poetry через официальный install-скрипт
+# (ставится в POETRY_HOME)
+RUN curl -sSL https://install.python-poetry.org | python3 -
+
+# Отключаем создание виртуальных окружений Poetry,
+# чтобы зависимости ставились прямо в системный Python контейнера
+RUN poetry config virtualenvs.create false
+
+# Рабочая директория внутри контейнера
 WORKDIR /usr/workspace
 
-# Copy the dependencies file to the working directory
-COPY ./requirements.txt /usr/workspace
+# Копируем только файлы зависимостей сначала
+# (это позволяет кешировать слой Docker и не переустанавливать зависимости при изменении кода)
+COPY pyproject.toml poetry.lock ./
 
-# Install Python dependencies
-RUN pip3 install -r requirements.txt
+# Установка Python-зависимостей через Poetry
+# --no-interaction: без интерактивного режима
+# --no-ansi: отключение цветного вывода (чище логи)
+RUN poetry install --no-interaction --no-ansi
+
+# Копируем весь исходный код проекта в контейнер
+COPY . .
+
+# Установка Allure (инструмент для отчетов тестирования):
+# - скачиваем архив с Maven репозитория
+# - распаковываем в /opt
+# - создаём символическую ссылку для удобного запуска команды `allure`
+RUN curl -Ls https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/2.32.0/allure-commandline-2.32.0.tgz \
+    | tar -xz -C /opt/ \
+    && ln -s /opt/allure-2.32.0/bin/allure /usr/local/bin/allure
