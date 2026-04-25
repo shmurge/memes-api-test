@@ -116,6 +116,7 @@ class TestMemesEndpoints(BaseTest):
         payload.create_meme.url = url
         self.memes_api.create_meme_with_invalid_payload(payload.create_meme)
 
+    @pytest.mark.test
     @allure.feature('Создание мема')
     @allure.title('Статус 400, если поле tags не список')
     @pytest.mark.medium

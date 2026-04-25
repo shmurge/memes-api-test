@@ -10,7 +10,6 @@ payload = MemesPayloads()
 @allure.story('API тесты')
 class TestMemes(BaseTest):
 
-    @pytest.mark.test
     @allure.feature('Создание мема')
     @allure.title('Создать новый мем')
     @pytest.mark.high
