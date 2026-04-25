@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   run_tests:
-    image: shmurge3/memes-api-tests:latest
+    image: shmurge3/memes-api-tests:v1.0.0
     build:
       context: .
       dockerfile: Dockerfile

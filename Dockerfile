@@ -1,64 +1,54 @@
-# FROM python:3.11-alpine3.17
-# # update apk repo
-# RUN echo "https://dl-4.alpinelinux.org/alpine/v3.10/main" >> /etc/apk/repositories && \
-#     echo "https://dl-4.alpinelinux.org/alpine/v3.10/community" >> /etc/apk/repositories
-#
-# # Get all the prereqs
-# RUN wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub
-# RUN wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.30-r0/glibc-2.30-r0.apk
-# RUN wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.30-r0/glibc-bin-2.30-r0.apk
-#
-# RUN apk update && \
-#     apk add openjdk11-jre curl tar && \
-#     curl -o allure-2.32.0.tgz -Ls https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/2.32.0/allure-commandline-2.32.0.tgz && \
-#     tar -zxvf allure-2.32.0.tgz -C /opt/ && \
-#     ln -s /opt/allure-2.32.0/bin/allure /usr/bin/allure && \
-#     rm allure-2.32.0.tgz
-#
-# WORKDIR /usr/workspace
-#
-# # Copy the dependencies file to the working directory
-# COPY ./requirements.txt /usr/workspace
-
-
-
+# Базовый образ: Python 3.11 на Alpine Linux (минимальный и лёгкий дистрибутив)
 FROM python:3.11-alpine3.17
-# update apk repo
-RUN echo "https://dl-4.alpinelinux.org/alpine/v3.17/main" >> /etc/apk/repositories && \
-    echo "https://dl-4.alpinelinux.org/alpine/v3.17/community" >> /etc/apk/repositories
 
-# Базовые зависимости + билд-инструменты
-RUN apk update && apk add --no-cache \
+# Установка системных зависимостей
+RUN apk add --no-cache \
     curl \
     bash \
     build-base \
     libffi-dev \
-    openssl-dev
+    openssl-dev \
+    openjdk11-jre \
+    tar \
+    wget
 
-# Установка Poetry
+# Версия Poetry (менеджер зависимостей Python)
 ENV POETRY_VERSION=2.3.4
+
+# Директория установки Poetry
+ENV POETRY_HOME=/opt/poetry
+
+# Добавление Poetry и user-local bin в PATH,
+# чтобы команда `poetry` была доступна глобально
+ENV PATH="$POETRY_HOME/bin:/root/.local/bin:$PATH"
+
+# Установка Poetry через официальный install-скрипт
+# (ставится в POETRY_HOME)
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
-# Добавляем Poetry в PATH
-ENV PATH="/root/.local/bin:$PATH"
-
-# (опционально) отключаем виртуальное окружение
+# Отключаем создание виртуальных окружений Poetry,
+# чтобы зависимости ставились прямо в системный Python контейнера
 RUN poetry config virtualenvs.create false
 
-# Get all the prereqs
-RUN wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub
-RUN wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.30-r0/glibc-2.30-r0.apk
-RUN wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.30-r0/glibc-bin-2.30-r0.apk
-
-RUN apk update && \
-    apk add openjdk11-jre curl tar && \
-    curl -o allure-2.32.0.tgz -Ls https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/2.32.0/allure-commandline-2.32.0.tgz && \
-    tar -zxvf allure-2.32.0.tgz -C /opt/ && \
-    ln -s /opt/allure-2.32.0/bin/allure /usr/bin/allure && \
-    rm allure-2.32.0.tgz
-
+# Рабочая директория внутри контейнера
 WORKDIR /usr/workspace
 
+# Копируем только файлы зависимостей сначала
+# (это позволяет кешировать слой Docker и не переустанавливать зависимости при изменении кода)
 COPY pyproject.toml poetry.lock ./
 
-RUN poetry install
+# Установка Python-зависимостей через Poetry
+# --no-interaction: без интерактивного режима
+# --no-ansi: отключение цветного вывода (чище логи)
+RUN poetry install --no-interaction --no-ansi
+
+# Копируем весь исходный код проекта в контейнер
+COPY . .
+
+# Установка Allure (инструмент для отчетов тестирования):
+# - скачиваем архив с Maven репозитория
+# - распаковываем в /opt
+# - создаём символическую ссылку для удобного запуска команды `allure`
+RUN curl -Ls https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/2.32.0/allure-commandline-2.32.0.tgz \
+    | tar -xz -C /opt/ \
+    && ln -s /opt/allure-2.32.0/bin/allure /usr/local/bin/allure
